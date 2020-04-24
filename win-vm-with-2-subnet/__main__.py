@@ -37,13 +37,15 @@ VIRTUAL_MACHINES = [
         'name': '',
         'os_type': 'Windows',
         'location': '',
-        'size': 'Standard_D2_v3'
+        'size': 'Standard_D2_v3',
+        'public': True
     },
     {
         'name': '',
         'os_type': 'Windows',
         'location': '',
-        'size': 'Standard_D2_v3'
+        'size': 'Standard_D2_v3',
+        'public': False
     }
 ]
 
@@ -98,6 +100,30 @@ def NewNIC(rg, subnet, index=int, vm_name=str):
             'subnet_id': subnet.id,
             'privateIpAddressAllocation': 'Dynamic'
         }]
+    )
+
+def NewNICwithPublicIP(rg, subnet, public_ip, index=int, vm_name=str):
+    return azure.network.NetworkInterface(
+        f'nic{index}',
+        name=f'{vm_name}-nic',
+        location=rg.location,
+        resource_group_name=rg.name,
+        ip_configurations=[{
+            'name': f'{vm_name}-ipconfig',
+            'subnet_id': subnet.id,
+            'privateIpAddressAllocation': 'Dynamic',
+            'publicIpAddressId': public_ip.id
+        }]
+    )
+
+def NewPublicIP(rg, index=int, vm_name=str):
+    return azure.network.PublicIp(
+        f'public_ip{index}',
+        name=f'{vm_name}-pip',
+        location=rg.location,
+        resource_group_name=rg.name,
+        allocation_method='Static',
+        sku='Standard'
     )
 
 def NewStorage(rg, index=int, name=str):
@@ -155,8 +181,12 @@ subnet_dmz = subnets[0]
 subnet_mz = subnets[1]
 nsgs = [NewNSG(rg=rg, index=NSGS.index(nsg), name=nsg['name']) for nsg in NSGS]
 assoc_subnet_nsg = [AssociateSubnetNSG(subnet=subnets[index], nsg=nsgs[index], index=index) for index in range(2)]
+public_ip = NewPublicIP(rg=rg, index=0, vm_name=VIRTUAL_MACHINES[0]['name'])
 storage = NewStorage(rg=rg, index=0, name=STORAGE_ACCOUNT['name'])
 
 for vm in VIRTUAL_MACHINES:
+    if (vm['public']):
+        nic = NewNICwithPublicIP(rg=rg, index=VIRTUAL_MACHINES.index(vm), vm_name=vm['name'], subnet=subnets[VIRTUAL_MACHINES.index(vm)], public_ip=public_ip)
+    else:
     nic = NewNIC(rg=rg, index=VIRTUAL_MACHINES.index(vm), vm_name=vm['name'], subnet=subnets[VIRTUAL_MACHINES.index(vm)])
     vm = NewWindowsVM(rg=rg, index=VIRTUAL_MACHINES.index(vm), name=vm['name'], storage=storage, nic=nic, size=vm['size'], username=ADMIN_USER_NAME, password=ADMIN_PASSWORD)
