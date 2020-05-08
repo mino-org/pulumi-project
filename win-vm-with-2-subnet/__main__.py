@@ -188,5 +188,5 @@ for vm in VIRTUAL_MACHINES:
     if (vm['public']):
         nic = NewNICwithPublicIP(rg=rg, index=VIRTUAL_MACHINES.index(vm), vm_name=vm['name'], subnet=subnets[VIRTUAL_MACHINES.index(vm)], public_ip=public_ip)
     else:
-    nic = NewNIC(rg=rg, index=VIRTUAL_MACHINES.index(vm), vm_name=vm['name'], subnet=subnets[VIRTUAL_MACHINES.index(vm)])
+	    nic = NewNIC(rg=rg, index=VIRTUAL_MACHINES.index(vm), vm_name=vm['name'], subnet=subnets[VIRTUAL_MACHINES.index(vm)])
     vm = NewWindowsVM(rg=rg, index=VIRTUAL_MACHINES.index(vm), name=vm['name'], storage=storage, nic=nic, size=vm['size'], username=ADMIN_USER_NAME, password=ADMIN_PASSWORD)
