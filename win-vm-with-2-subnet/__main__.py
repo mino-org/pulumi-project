@@ -36,14 +36,14 @@ VIRTUAL_MACHINES = [
     {
         'name': '',
         'os_type': 'Windows',
-        'location': '',
+        'location': 'japaneast',
         'size': 'Standard_D2_v3',
         'public': True
     },
     {
         'name': '',
         'os_type': 'Windows',
-        'location': '',
+        'location': 'japaneast',
         'size': 'Standard_D2_v3',
         'public': False
     }
@@ -71,7 +71,7 @@ def NewSubnet(rg, vnet, index=int, name=str, addr_prefix=str):
         name=name,
         resource_group_name=rg.name,
         virtual_network_name=vnet.name,
-        address_prefix=addr_prefix
+        address_prefixes=[addr_prefix]
     )
 
 def NewNSG(rg, index=int, name=str):

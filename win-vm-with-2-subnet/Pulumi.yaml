@@ -1,0 +1,4 @@
+name: win-vm-with-2-subnet
+runtime: python
+description: Deployment operation environment for TechnicalDesk
+
