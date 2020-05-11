@@ -1,49 +1,50 @@
 import pulumi
 import pulumi_azure as azure
 
-ADMIN_USER_NAME = 'azureuser'
-ADMIN_PASSWORD = '1qazZAQ!1qazZAQ!'
+config = pulumi.Config()
+data = config.require_object('data')
+
 RESOURCE_GROUP = {
-    'name': '',
-    'location': ''
+    'name': data['rg']['name'],
+    'location': data['rg']['location']
 }
 VIRTUAL_NETWORK = {
-    'name': '',
-    'addr_space': '10.0.0.0/16'
+    'name': data['vnet']['name'],
+    'addr_space': data['vnet']['addr_space']
 }
 SUBNETS = [
     {
-        'name': 'dmz',
-        'addr_prefix': '10.0.0.0/24'
+        'name': data['subnet'][0]['name'],
+        'addr_prefix': data['subnet'][0]['addr_prefix']
     },
     {
-        'name': 'mz',
-        'addr_prefix': '10.0.1.0/24'
+        'name': data['subnet'][1]['name'],
+        'addr_prefix': data['subnet'][1]['addr_prefix']
     }
 ]
 NSGS = [
     {
-        'name': 'dmz'
+        'name': data['nsg'][0]['name']
     },
     {
-        'name': 'mz'
+        'name': data['nsg'][1]['name']
     }
 ]
 STORAGE_ACCOUNT = {
-    'name': ''
+    'name': data['storage']['name']
 }
 VIRTUAL_MACHINES = [
     {
-        'name': '',
+        'name': data['vm'][0]['name'],
         'os_type': 'Windows',
-        'location': 'japaneast',
+        'location': data['rg']['location'],
         'size': 'Standard_D2_v3',
         'public': True
     },
     {
-        'name': '',
+        'name': data['vm'][1]['name'],
         'os_type': 'Windows',
-        'location': 'japaneast',
+        'location': data['rg']['location'],
         'size': 'Standard_D2_v3',
         'public': False
     }
@@ -188,5 +189,5 @@ for vm in VIRTUAL_MACHINES:
     if (vm['public']):
         nic = NewNICwithPublicIP(rg=rg, index=VIRTUAL_MACHINES.index(vm), vm_name=vm['name'], subnet=subnets[VIRTUAL_MACHINES.index(vm)], public_ip=public_ip)
     else:
-	    nic = NewNIC(rg=rg, index=VIRTUAL_MACHINES.index(vm), vm_name=vm['name'], subnet=subnets[VIRTUAL_MACHINES.index(vm)])
-    vm = NewWindowsVM(rg=rg, index=VIRTUAL_MACHINES.index(vm), name=vm['name'], storage=storage, nic=nic, size=vm['size'], username=ADMIN_USER_NAME, password=ADMIN_PASSWORD)
+        nic = NewNIC(rg=rg, index=VIRTUAL_MACHINES.index(vm), vm_name=vm['name'], subnet=subnets[VIRTUAL_MACHINES.index(vm)])
+    vm = NewWindowsVM(rg=rg, index=VIRTUAL_MACHINES.index(vm), name=vm['name'], storage=storage, nic=nic, size=vm['size'], username=data['username'], password=data['password'])
