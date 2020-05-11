@@ -151,7 +151,7 @@ def NewWindowsVM(rg, nic, storage, index=int, name=str, size='Standard_D2s_v3', 
         storage_image_reference={
             'publisher': 'MicrosoftWindowsServer',
             'offer': 'WindowsServer',
-            'sku': '2019-Datacenter',
+            'sku': '2016-Datacenter',
             'version': 'latest'
         },
         storage_os_disk={
